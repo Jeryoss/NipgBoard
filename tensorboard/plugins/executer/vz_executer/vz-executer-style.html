@@ -1,0 +1,72 @@
+<link rel="import" href="../tf-dashboard-common/tensorboard-color.html">
+
+<dom-module id="vz-executer-style">
+  <template>
+    <style>
+    :host {
+      background-color: #f5f5f5;
+      display: flex;
+      width: 95%;
+      color: black;
+      cursor: auto;
+      vertical-align: middle;
+    }
+    
+    .title {
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      color: black;
+      display: flex;
+      font-weight: 500;
+      height: 20px;
+      padding-left: 10px;
+    }
+    
+    
+    paper-tooltip {
+      --paper-tooltip: {
+        width: 60%;
+        left: 20%;
+        text-align: center;
+        font-size: 15px;
+        z-index: 999;
+        position:relative;
+      }
+    }
+    
+    #container {
+      align-content:center;
+      width:100%;
+      height:100%;
+    }
+    
+    #buttons {
+      position: relative;
+      text-align: center;
+      margin-top: 10px;
+    }
+    
+    #VGGbutton{
+      padding-right: 20px;
+    }
+    
+    #seleniumtest{
+      visibility: hidden;
+    }
+    
+    #ExecButton{
+      background-color: #02b7f1;
+    }
+    
+    #DetailsButton{
+      margin-top: 5px;
+      background-color: #02b7f1;
+    }
+    
+    paper-textarea {
+      height: 100%;
+    }
+    
+    </style>
+  </template>
+</dom-module>

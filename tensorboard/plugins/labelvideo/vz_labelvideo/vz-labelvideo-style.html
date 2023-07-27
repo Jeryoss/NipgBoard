@@ -1,0 +1,74 @@
+<link rel="import" href="../tf-dashboard-common/tensorboard-color.html">
+
+<dom-module id="vz-labelvideo-style">
+    <template>
+        <style>
+            #vidcontainer {
+                height: 80%;
+                width: 100%;
+                display: block;
+            }
+    
+            #vid1, #vid2, #vid3, #vid4 {
+                height: 50%;
+                width: 50%;
+                float: left;
+            }
+    
+            #vid1msg {
+                display: contents;
+            }
+    
+            #LVvid1, #LVvid2, #LVvid3, #LVvid4 {
+                height: 90%;
+                width: 100%;
+                float: left;
+            }
+    
+            #controls1, #controls2, #controls3, #controls4 {
+                height: 10%;
+                float: left;
+                width: 100%;
+            }
+    
+            #LVoverlay1, #LVoverlay2, #LVoverlay3, #LVoverlay4 {
+                z-index: 2;
+                background: transparent;
+                pointer-events: none;
+                display: block;
+                position: absolute;
+            }
+    
+            #buttons {
+                height: 5%;
+            }
+    
+            #labelcontainer {
+                height: 5%;
+                width: 100%;
+                display: flex;
+                padding: 5px;
+                border-width: 2px;
+                border-style: outset;
+                border-color:lightblue
+            }
+    
+            #labels {
+                height: 15%;
+                border-width: 2px;
+                border-style: inset;
+                background-color:lightblue
+            }
+    
+            .anno {
+                height: 70%;
+                float: left;
+            }
+    
+            paper-icon-button[active].vz-labelvideo {
+                color: white;
+                background-color: #880E4F;
+            }
+        </style>
+    </template>
+</dom-module>

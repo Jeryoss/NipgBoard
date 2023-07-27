@@ -1,0 +1,92 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="vz-labelvideo-style.html">
+<script src="vz-labelvideo-util.js"></script>
+
+<dom-module id="vz-labelvideo">
+
+    <style include="vz-executer-style"></style>
+    <template>
+        <div id="vidcontainer">
+            <div id="vid1">
+                <canvas id="LVoverlay1"></canvas>
+                <video id="LVvid1" class="labelvideo-player" controls="controls">
+                        <source type="video/mp4">
+                </video>
+                <div id="controls1">
+                    <select id="LVvidselec1"></select>
+                    <paper-icon-button id="LVprev1" icon="icons:chevron-left"></paper-icon-button>
+                    <paper-tooltip for="LVprev1" position="bottom" animation-delay="0" fit-to-visible-bounds>Previous Frame</paper-tooltip>
+
+                    <paper-icon-button id="LVnext1" icon="icons:chevron-right"></paper-icon-button>
+                    <paper-tooltip for="LVnext1" position="bottom" animation-delay="0" fit-to-visible-bounds>Next Frame</paper-tooltip>
+                    <select id="LVovselec1"></select>
+                    <div id="vid1msg">Main Video Player for From-To Labeling</div>
+                </div>
+            </div>
+            <div id="vid2">
+                <canvas id="LVoverlay2"></canvas>
+                <video id="LVvid2" class="labelvideo-player" controls="controls">
+                    <source type="video/mp4">
+                </video>
+                <div id="controls2">
+                    <select id="LVvidselec2"></select>
+                    <paper-icon-button id="LVprev2" icon="icons:chevron-left"></paper-icon-button>
+                    <paper-tooltip for="LVprev2" position="bottom" animation-delay="0" fit-to-visible-bounds>Previous Frame</paper-tooltip>
+                    <paper-icon-button id="LVnext2" icon="icons:chevron-right"></paper-icon-button>
+                    <paper-tooltip for="LVnext2" position="bottom" animation-delay="0" fit-to-visible-bounds>Next Frame</paper-tooltip>
+                    <select id="LVovselec2"></select>
+                </div>
+            </div>
+            <div id="vid3">
+                <canvas id="LVoverlay3"></canvas>
+                 <video id="LVvid3" class="labelvideo-player" controls="controls">
+                    <source type="video/mp4">
+                </video>
+                <div id="controls3">
+                    <select id="LVvidselec3"></select>
+                    <paper-icon-button id="LVprev3" icon="icons:chevron-left"></paper-icon-button>
+                    <paper-tooltip for="LVprev3" position="top" animation-delay="0" fit-to-visible-bounds>Previous Frame</paper-tooltip>
+                    <paper-icon-button id="LVnext3" icon="icons:chevron-right"></paper-icon-button>
+                    <paper-tooltip for="LVnext3" position="top" animation-delay="0" fit-to-visible-bounds>Next Frame</paper-tooltip>
+                    <select id="LVovselec3"></select>
+                </div>
+            </div>
+            <div id="vid4">
+                <canvas id="LVoverlay4"></canvas>
+                <video id="LVvid4" class="labelvideo-player" controls="controls">
+                    <source type="video/mp4">
+                </video>
+                <div id="controls4">
+                    <select id="LVvidselec4"></select>
+                    <paper-icon-button id="LVprev4" icon="icons:chevron-left"></paper-icon-button>
+                    <paper-tooltip for="LVprev4" position="top" animation-delay="0" fit-to-visible-bounds>Previous Frame</paper-tooltip>
+                    <paper-icon-button id="LVnext4" icon="icons:chevron-right"></paper-icon-button>
+                    <paper-tooltip for="LVnext4" position="top" animation-delay="0" fit-to-visible-bounds>Next Frame</paper-tooltip>
+                    <select id="LVovselec4"></select>
+                </div>
+            </div>
+        </div>
+        <div id="labelcontainer">
+            <paper-icon-button id="LVSync" icon="icons:swap-horiz" toggles ></paper-icon-button>
+            <paper-tooltip for="LVSync" position="bottom" animation-delay="0" fit-to-visible-bounds>Synchronize Videos</paper-tooltip>
+            <paper-icon-button id="LVAnno" icon="icons:speaker-notes" toggles ></paper-icon-button>
+            <paper-tooltip for="LVAnno" position="bottom" animation-delay="0" fit-to-visible-bounds>Annotate Label</paper-tooltip>
+            <paper-icon-button id="LVDele" icon="icons:speaker-notes-off" toggles ></paper-icon-button>
+            <paper-tooltip for="LVDele" position="bottom" animation-delay="0" fit-to-visible-bounds>Delete Label</paper-tooltip>
+            <paper-icon-button id="LVmul1" icon="image:filter-1"></paper-icon-button>
+            <paper-tooltip for="LVmul1" position="bottom" animation-delay="0" fit-to-visible-bounds>Display One Video</paper-tooltip>
+            <paper-icon-button id="LVmul2" icon="image:filter-2"></paper-icon-button>
+            <paper-tooltip for="LVmul2" position="bottom" animation-delay="0" fit-to-visible-bounds>Display Two Videos</paper-tooltip>
+            <paper-icon-button id="LVmul3" icon="image:filter-3"></paper-icon-button>
+            <paper-tooltip for="LVmul3" position="bottom" animation-delay="0" fit-to-visible-bounds>Display Three Videos</paper-tooltip>
+            <paper-icon-button id="LVmul4" icon="image:filter-4"></paper-icon-button>
+            <paper-tooltip for="LVmul4" position="bottom" animation-delay="0" fit-to-visible-bounds>Display Four Videos</paper-tooltip>
+            <select id="LVLabelselec"></select>
+        </div>
+        <div id="labels">
+
+        </div>
+    </template>
+    <script src="vz-labelvideo.js">
+    </script>
+</dom-module>

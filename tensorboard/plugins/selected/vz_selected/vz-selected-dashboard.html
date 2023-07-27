@@ -1,0 +1,52 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../tf-backend/tf-backend.html">
+<link rel="import" href="../tf-dashboard-common/tf-no-data-warning.html">
+<link rel="import" href="../tf-tensorboard/registry.html">
+<link rel="import" href="vz-selected.html">
+
+<dom-module id="vz-selected-dashboard">
+    <template>
+        <vz-selected route-prefix="[[_routePrefix]]" serving-mode="server" page-view-logging event-logging>
+
+        </vz-selected>
+    </template>
+
+<script>
+    Polymer({
+        is: 'vz-selected-dashboard',
+        properties: {
+            dataNotFound: Boolean,
+            _routePrefix: {
+                type: String,
+                value: () => tf_backend.getRouter().pluginRoute('selected',''),
+            },
+            _initialized: Boolean,
+        },
+        reload() {
+        },
+        attached() {
+            if (this._initialized) {
+                return;
+            }
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', this._routePrefix + '/runs');
+            xhr.onload = () => {
+                this._initialized = true;
+                let runs = JSON.parse(xhr.responseText);
+                this.set('dataNotFound', runs.length === 0);
+            };
+            xhr.onerror = () => {
+                this.set('dataNotFound', false);
+            };
+            xhr.send();
+        },
+    });
+
+    tf_tensorboard.registerDashboard({
+        plugin: 'selected',
+        elementName: 'vz-selected-dashboard',
+        isReloadDisabled: false,
+    });
+    
+</script>
+</dom-module>

@@ -1,0 +1,192 @@
+<link rel="import" href="../tf-dashboard-common/tensorboard-color.html">
+
+<dom-module id="vz-graphcut-style">
+    <template>
+        <style>
+        :host {
+        background-color: #f5f5f5;
+        display: flex;
+        width: 95%;
+        color: black;
+        cursor: auto;
+        vertical-align: middle;
+        }
+    
+        .title {
+        align-items: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        color: black;
+        display: flex;
+        font-weight: 500;
+        height: 20px;
+        padding-left: 10px;
+        }
+    
+        #container {
+        align-content:center;
+        width:100%;
+        height:100%;
+        }
+    
+    
+        paper-tooltip {
+        --paper-tooltip: {
+            width: 60%;
+            left: 20%;
+            text-align: center;
+            font-size: 15px;
+            z-index: 999;
+            position:relative;
+        }
+        }
+    
+        paper-textarea {
+        height: 100%;
+        }
+    
+        .gcdiv{
+            align-content:center;
+            width:100%;
+            height:100%;
+        }
+    
+        .gcbtndiv{
+            text-align: center;
+        }
+    
+        #gcfractext{
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+    
+        #gcclustext{
+            display: inline-block;
+            margin-left: 10px;
+        }
+    
+        #gccluster{
+            width: 100%;
+        }
+    
+        #graphcut{
+            background-color: #02b7f1;
+            font-size: 90%;
+            margin-top: 20px;
+        }
+    
+        #graphcutaccuracy{
+            margin-left: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    
+        #exportbutton{
+            width: 90%;
+            background-color: #02b7f1;
+            margin: auto;
+            margin-top: 10px;
+        }
+    
+        #gcfrtext{
+            height: 120%;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+    
+        #gcinput{
+            size: 200%;
+        }
+    
+        #gcnumber{
+            width: 60px;
+        }
+    
+        #graphcutimage{
+            width: 350px;
+            height: 350px;
+        }
+    
+        .gcimagecontainer{
+            text-align:center;
+        }
+    
+        .collapsible {
+            cursor: pointer;
+            padding: 13px;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            margin-right: 20px;
+            width: 95%;
+            background-color: #02b7f1;
+            color: black;
+            border-radius: 3px;
+            }
+    
+        .collapsible:after {
+            content: '\002B';
+            color: black;
+            font-weight: bold;
+            float: right;
+            margin-left: 5px;
+            }
+    
+            .active:after {
+            content: "\2212";
+            }
+    
+        .content {
+            padding: 0 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: #f1f1f1;
+            }
+    
+        .none{
+            display: none;
+        }
+    
+        .norm{
+            display: unset;
+        }
+    
+        #gcfraction{
+            grid-column: 1;
+            grid-row: 1;
+            width: 100%;
+        }
+    
+        #gcfracinput{
+            grid-column: 2;
+            grid-row:1;
+            width: 100%;
+            text-align: center;
+        }
+    
+        #gccluster{
+            width: 100%;
+            grid-column: 1/3;
+            grid-row:1;
+        }
+    
+        .gcfraction{
+            width: 96%;
+            display:grid;
+            grid-template-columns: 75% 20%;
+        }
+    
+        #resultdiv{
+            max-height: 500px;
+            overflow-y: auto;
+            text-align: center;
+        }
+    
+        paper-slider { 
+            --paper-slider-input: {width: 120px} 
+        }
+    
+        </style>
+    </template>
+</dom-module>

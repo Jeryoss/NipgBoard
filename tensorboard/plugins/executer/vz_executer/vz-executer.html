@@ -1,0 +1,59 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="vz-executer-style.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../neon-animation/web-animations.html">
+<script href="../webcomponentsjs/webcomponents.js"></script>
+<script src="vz-executer-util.js"></script>
+
+
+
+<dom-module id="vz-executer">
+<template>
+<style include="vz-executer-style"></style>
+
+<div id="container" style="width:100%;height:100%">
+<div class="title">TRAIN CLUSTERING
+  <paper-icon-button icon="help" class="help-icon"></paper-icon-button>
+  <paper-tooltip animation-delay="0" offset="0">
+    You can choose here which algorithm to retrain with which modification technique.
+  </paper-tooltip>
+</div>
+
+<div id="buttons">
+<paper-dropdown-menu id="dropmenu"  label="Select algorithm...">
+  <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{selecteditem}}">
+    <template is="dom-repeat" items="{{names}}">
+      <paper-item>{{item}}</paper-item>
+    </template>
+  </paper-listbox>
+</paper-dropdown-menu>
+<paper-button id="ExecButton" on-tap="runTraining" disabled="{{runnable}}">Run Training</paper-button> 
+<paper-button id="DetailsButton" on-tap="showDetails">Training Details</paper-button> 
+</div>
+
+<div id="seleniumtest">
+  <input id="selectedRunTest" value="{{_selectedRunTest}}" type="text">
+</div>
+
+</div>
+
+<paper-dialog with-backdrop id="details">
+  <h2>Training Details</h2>
+  <div>Please check carefully that the embedding displayed and the training methods selected match the desired progress goals!</div>
+  <div id="training-name">none</div>
+  <div id="embedding-to">none</div>
+  <div id="algorithm-path">none</div>
+  <div id="used-embedding">none</div>
+  <div id="used-database">none</div>
+  <div id="training-type">none</div>
+  <div id="new-model">none</div>
+</paper-dialog>
+
+</template> <!-- global template -->
+<script src="vz-executer.js"></script>
+</dom-module>
+

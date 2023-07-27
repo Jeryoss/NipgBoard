@@ -1,0 +1,52 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../tf-backend/tf-backend.html">
+<link rel="import" href="../tf-dashboard-common/tf-no-data-warning.html">
+<link rel="import" href="../tf-tensorboard/registry.html">
+<link rel="import" href="vz-labelvideo.html">
+
+<dom-module id="vz-labelvideo-dashboard">
+    <template>
+        <vz-labelvideo vis="visible" route-prefix="[[_routePrefix]]" serving-mode="server" page-view-logging event-logging>
+
+        </vz-labelvideo>
+    </template>
+
+<script>
+    Polymer({
+        is: 'vz-labelvideo-dashboard',
+        properties: {
+            dataNotFound: Boolean,
+            _routePrefix: {
+                type: String,
+                value: () => tf_backend.getRouter().pluginRoute('labelvideo',''),
+            },
+            _initialized: Boolean,
+        },
+        reload() {
+        },
+        attached() {
+            if (this._initialized) {
+                return;
+            }
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', this._routePrefix + '/runs');
+            xhr.onload = () => {
+                this._initialized = true;
+                let runs = JSON.parse(xhr.responseText);
+                this.set('dataNotFound', runs.length === 0);
+            };
+            xhr.onerror = () => {
+                this.set('dataNotFound', false);
+            };
+            xhr.send();
+        },
+    });
+
+    tf_tensorboard.registerDashboard({
+        plugin: 'labelvideo',
+        elementName: 'vz-labelvideo-dashboard',
+        isReloadDisabled: false,
+    });
+    
+</script>
+</dom-module>

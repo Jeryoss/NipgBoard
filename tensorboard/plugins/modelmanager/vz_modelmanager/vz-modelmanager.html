@@ -1,0 +1,75 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="vz-modelmanager-style.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../neon-animation/web-animations.html">
+<script href="../webcomponentsjs/webcomponents.js"></script>
+<script src="vz-modelmanager-util.js"></script>
+
+
+<dom-module id="vz-modelmanager">
+<template>
+<style include="vz-modelmanager-style"></style>
+
+<div id="container" style="width:100%;height:100%">
+<div class="title">SELECT EMBEDDING
+  <paper-icon-button icon="help" class="help-icon"></paper-icon-button>
+  <paper-tooltip animation-delay="0" offset="0">
+    You can select here one of the created embeddings to load it into the projection space.
+  </paper-tooltip>
+</div>
+
+<div id="runsDropdown">
+<paper-dropdown-menu id="baseresults" label="Base embeddings">
+  <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{selectedBase}}">
+    <template is="dom-repeat" items="{{bases}}">
+      <paper-item>{{item}}</paper-item>
+    </template>
+  </paper-listbox>
+</paper-dropdown-menu>
+<paper-dropdown-menu id="trainingresults" label="Training results">
+  <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{selectedTraining}}">
+    <template is="dom-repeat" items="{{trainings}}">
+      <paper-item>{{item}}</paper-item>
+    </template>
+  </paper-listbox>
+</paper-dropdown-menu>
+<hr>
+<div class="title">START CLUSTERING
+  <paper-icon-button icon="help" class="help-icon"></paper-icon-button>
+  <paper-tooltip animation-delay="0" offset="0">
+    Start here your visual investigation! Select an algorithm and a database to see the clustering results.
+  </paper-tooltip>
+</div>
+<paper-dropdown-menu id="algorithms"  label="Select algorithm">
+  <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{selectedAlgorithm}}">
+    <template is="dom-repeat" items="{{algorithms}}">
+      <paper-item>{{item}}</paper-item>
+    </template>
+  </paper-listbox>
+</paper-dropdown-menu>
+
+<paper-dropdown-menu id="databases"  label="Select database">
+  <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{selectedDatabase}}">
+    <template is="dom-repeat" items="{{databases}}">
+      <paper-item>{{item}}</paper-item>
+    </template>
+  </paper-listbox>
+</paper-dropdown-menu>
+
+<paper-button id="RunButton" on-tap="runTraining" disabled="{{runnable}}">Run evaluation</paper-button> 
+</div>
+
+<div id="seleniumtest">
+  <input id="selectedRunTest" value="{{_selectedRunTest}}" type="text">
+</div>
+
+</div>
+
+</template> <!-- global template -->
+<script src="vz-modelmanager.js"></script>
+</dom-module>
+

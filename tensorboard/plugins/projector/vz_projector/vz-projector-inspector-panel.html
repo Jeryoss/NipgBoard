@@ -1,0 +1,101 @@
+<!--
+@license
+Copyright 2016 The TensorFlow Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="bundle.html">
+<link rel="import" href="styles.html">
+<link rel="import" href="vz-projector-input.html">
+
+<dom-module id="vz-projector-inspector-panel">
+<style include="vz-projector-styles"></style>
+<style include="vz-projector-inspector-panel-style"></style>
+<template>
+<div class="title">FILTER DATA POINTS</div>
+<div class="container">
+  <div class="buttons">
+    <button class="button reset-filter">Show All Data</button>
+    <button class="button set-filter">Isolate selection</button>
+    <button class="button clear-selection">Clear selection</button>
+  </div>
+  <div class="search-by">
+    <vz-projector-input id="search-box" label="Search"></vz-projector-input>
+    <paper-dropdown-menu no-animations label="by">
+      <paper-listbox attr-for-selected="value" class="dropdown-content" selected="{{selectedMetadataField}}" slot="dropdown-content">
+        <template is="dom-repeat" items="[[metadataFields]]">
+          <paper-item value="[[item]]" label="[[item]]">
+            [[item]]
+          </paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+  </div>
+</div>
+<div class="results">
+  <div class="nn" style="display: none">
+    <div class="neighbors">
+      <div class="neighbors-options">
+        <div class="slider num-nn">
+          <span class="option-label">neighbors</span>
+          <paper-icon-button icon="help" class="help-icon"></paper-icon-button>
+          <paper-tooltip position="bottom" animation-delay="0" fit-to-visible-bounds>
+            The number of neighbors (in the original space) to show when clicking on a point.
+          </paper-tooltip>
+          <paper-slider class="nn-slider" pin min="5" max="999" editable
+              value="{{numNN}}" on-change="updateNumNN"></paper-slider>
+        </div>
+      </div>
+      <div class="distance">
+        <span class="option-label">distance</span>
+        <div class="options">
+          <a class="selected cosine" href="javascript:void(0);">COSINE</a>
+          <a class="euclidean" href="javascript:void(0);">EUCLIDEAN</a>
+        </div>
+      </div>
+    </div>
+    <p>Nearest points in the original space:
+    <div class="nn-list"></div>
+  </div>
+  <div class="metadata-info" style="display: none">
+    <div class="neighbors-options">
+      <div class="slider num-nn">
+        <span class="option-label">neighbors</span>
+        <paper-icon-button icon="help" class="help-icon"></paper-icon-button>
+        <paper-tooltip position="bottom" animation-delay="0" fit-to-visible-bounds>
+          The number of neighbors (in the selected space) to show when clicking on a point.
+        </paper-tooltip>
+        <paper-slider class="nn-slider" pin min="5" max="999" editable
+            value="{{numNN}}" on-change="updateNumNN"></paper-slider>
+      </div>
+    </div>
+    <p>{{metadataColumn}} labels (click to apply):</p>
+    <div class="metadata-list"></div>
+  </div>
+  <div class="matches-list" style="display: none">
+    <div class="list"></div>
+    <div class="limit-msg">Showing only the first 100 results...</div>
+  </div>
+</div>
+<!-- Closing global template -->
+</template>
+<script src="vz-projector-inspector-panel.js"></script>
+</dom-module>

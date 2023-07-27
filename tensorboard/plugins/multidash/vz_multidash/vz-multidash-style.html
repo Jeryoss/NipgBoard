@@ -1,0 +1,263 @@
+<link rel="import" href="../tf-dashboard-common/tensorboard-color.html">
+
+<dom-module id="vz-multidash-style">
+  <template>
+    <style>
+        #design-mode {
+            position: fixed;
+            top: 12px;
+            right: 160px;
+            color: white;
+            font-weight: bold;
+        }
+    
+        #copybutton{
+            background-color: #03a9f4;
+        }
+    
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    
+        #share-button {
+            position: fixed;
+            top: 12px;
+            right: 130px;
+            color: white;
+        }
+    
+        #showNotifications{
+            position: fixed;
+            top: 12px;
+            left: 130px;
+            color: white;
+        }
+    
+        #notifications{
+            min-width: 900px;
+            text-align: center;
+        }
+    
+        #lastNotification{
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    
+        #lastNotificationDiv{
+            position: fixed;
+            top: 7px;
+            left: 180px;
+            color: white;
+            width: 350px;
+            height: 50px;
+        }
+        
+        #help-icon {
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        #infCard{
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 30px;
+            transform: translateY(-50%);
+        }
+    
+        #infCardDiv{
+            position: fixed;
+            top: 7px;
+            left: 550px;
+            color: white;
+            width: 600px;
+            height: 50px;
+        }
+    
+        #notificationRedDot{
+            position: fixed;
+            top: 30px;
+            left: 166px;
+            color: red;
+            background-color: red;
+            width: 5px;
+            height: 5px;
+            border-radius: 2px;
+        }
+    
+        #multidash-collector {
+            height: 100%;
+            width: 100%;
+            display: block;
+            position: absolute;
+        }
+    
+        .title {
+          align-items: center;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          color: black;
+          display: flex;
+          font-weight: 500;
+          height: 20px;
+          padding-left: 10px;
+        }
+    
+        :host {
+          background-color: #f5f5f5;
+          display: flex;
+          width: 95%;
+          color: black;
+          cursor: auto;
+          vertical-align: middle;
+        }
+    
+        #container {
+        text-align: center;
+        align-content:center;
+        height:100%;
+        width: 100%;
+        }
+    
+        #login{
+        position: relative;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        width: 40%;
+        }
+    
+        .forgotpasswordinput{
+            min-width: 300px;
+        }
+    
+        
+        #hidden-login{
+        display: none;
+        height: 0px;
+        position: relative;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        width: 40%;
+        }
+    
+    
+        .button{
+            background-color: #29b5f6;
+            padding-left: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            padding-right: 30px;
+        }
+    
+        #visible{
+            visibility: visible;
+            background-color: white;
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+    
+        #hidden{
+            display: none;
+        }
+    
+        #forgotpasswordlink{
+            font-size: 90%;
+            margin-top: 50px;
+        }
+    
+        #forgotpassword{
+            text-align: center;
+            min-width: 500px;
+        }
+    
+        paper-input.no-underline {        
+              /* hide underline in all states */
+              --paper-input-container-underline: {
+                display: none
+              }
+              max-width: 30%;
+              margin-left: auto;
+              margin-right: auto;
+            }
+        paper-textarea.no-underline{
+            /* hide underline in all states */
+              --paper-input-container-underline: {
+                display: none
+              }
+              --paper-input-container-underline-focus: {
+                display: none
+              }
+              --paper-input-container-underline-disabled: {
+                display: none
+              }
+    
+        }
+    
+    
+        paper-tooltip {
+        --paper-tooltip: {
+            width: 60%;
+            left: 20%;
+            text-align: center;
+            font-size: 15px;
+            z-index: 999;
+            position:relative;
+        }
+        }
+    
+        /* Tooltip container */
+        .tooltip {
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black; 
+        }
+    
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: #00B7F2;
+            color: #fff;
+            text-align: center;
+            padding: 5px 0;
+            border-radius: 6px;
+    
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+    
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+    
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #00B7F2 transparent transparent transparent;
+        }
+    
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    
+        #container paper-icon-button{
+            color:gray;
+        }
+    
+    
+    </style>
+  </template>
+</dom-module>

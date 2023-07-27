@@ -1,0 +1,984 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="vz-multidash-style.html">
+<!--<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">-->
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<!--<link rel="import" href="../paper-menu/paper-menu.html">-->
+<link rel="import" href="../paper-button/paper-button.html">
+
+<dom-module id="vz-multidash">
+<template>
+<style include="vz-multidash-style"></style>
+
+<paper-dialog with-backdrop id="share">
+    <h2>Share</h2>
+    <div id="{{_sharenormal}}">
+        <div id="checkboxes">
+            <h3>Disable the following on the view:</h3>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_highres}}">high resolution images</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_sprite}}">sprite image</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_pairwise}}">kira pairing</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_training}}">kira run</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_download}}">download files</paper-checkbox>
+        </div>
+        <br>
+        <div class="tooltip">
+            <input style="margin-bottom: 5%;" type="text" onclick='this.select();document.execCommand("copy");' readonly value="{{_sharelink}}" id="linkinput"> 
+            <span class="tooltiptext">Click to copy!</span>
+        </div>
+    </div>
+    <div id="{{_shareerror}}">
+      Please log in first
+    </div>
+</paper-dialog>
+
+<paper-dialog with-backdrop id="notifications">
+    <div style="max-height: 400px;overflow: auto;">
+    <h3>Notifications</h3>
+    <table style="min-width: 100%; max-height: 500px; overflow-y: auto;">
+        <tr>
+          <th style="width: 40%; text-align: start;">Message</th>
+          <th>Timestamp</th>
+          <th>Plugin</th>
+          <th>Status</th>
+        </tr>
+        <template is="dom-repeat" items="[[_notifications]]">
+            <tr>
+                <td style="width: 40%; text-align: start;">[[item.title]]</td>
+                <td>[[item.date]]</td>
+                <td>[[item.plugin]]</td>
+                <td>
+                   <paper-icon-button icon="[[item.icon]]" style="color:[[item.color]];"></paper-icon-button>
+                </td>
+            </tr>
+        </template>
+      </table>
+    </div>
+</paper-dialog>
+
+<paper-dialog with-backdrop id="share">
+    <h2>Share</h2>
+    <div id="{{_sharenormal}}">
+        <div id="checkboxes">
+            <h3>Disable the following on the view:</h3>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_highres}}">Hide better resolution images</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_sprite}}">Hide sprite images</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_startClustering}}">Start clustering</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_evaluateClusters}}">Kira image pairing</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_unifyAndOutlier}}">Unify clusters and create outliers</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_modifyLabels}}">Modify labels</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_startTraining}}">Start training</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_downloadMetadata}}">Download metadata</paper-checkbox><br>
+            <paper-checkbox on-change="handlecheckboxChanged" checked="{{_downloadResults}}">Download results</paper-checkbox><br>
+        </div>
+        <br>
+        <div class="tooltip">
+            <input style="margin-bottom: 5%;" type="text" onclick='this.select();document.execCommand("copy");' readonly value="{{_sharelink}}" id="linkinput"> 
+            <span class="tooltiptext">Click to copy!</span>
+        </div>
+    </div>
+    <div id="{{_shareerror}}">
+      Please log in first
+    </div>
+</paper-dialog>
+
+
+
+
+<paper-dialog with-backdrop id="forgotpassword">
+    <h3>Reset password</h3>
+    <form action="">
+        <paper-input type="text"  no-label-float class="no-underline" value='{{_forgotpwname}}' label="Name"></paper-input>
+        <paper-input type="password"  no-label-float class="no-underline" value='{{_forgotpwglobal}}' label="Global password"></paper-input>
+        <paper-input type="password"  no-label-float class="no-underline" value='{{_forgotpwnew}}' label="New password"></paper-input>
+        <paper-input type="password"  no-label-float class="no-underline" value='{{_forgotpwnewconfirm}}' label="Confirm new password"></paper-input>
+        <paper-button type="submit" id="resetpwbtn" class="button" on-click="handleResetPw">Reset</paper-button>
+    </form>
+</paper-dialog>
+
+<div id="multidash-collector"></div>
+
+<div id="container" style$="visibility: {{_pwvisibility}}" style="width:100%;height:0%">
+	<div id="{{_logindivid}}">
+        <form id="loginform" method="post" on-submit="handleLogin">
+            <h2>Login</h2>
+            <paper-input id="loginusername" name="loginusername" no-label-float type="name" class="no-underline" value='{{_nameinput}}' label="Username"></paper-input>
+            <div style="display: inline;">
+            <paper-input id="loginpassword" name="loginpassword" no-label-float type="{{_loginpwtype}}" class="no-underline" value='{{_pwinput}}' label="Password">
+                <paper-icon-button tabindex="-1" suffix on-tap="changePw" icon="{{_loginpwvisicon}}"></paper-icon-button>
+            </paper-input>
+            </div>
+            <button style="display: none;" type="submit"></button>
+            <paper-button id="loginbtn" class="button" on-click="handleLogin">Log in</paper-button>
+            <paper-button class="button" id="navigatetoregisterbtn" on-click="gotoRegister">Register</paper-button> <br>
+        </form>
+        <a on-click="openForgotPassword">Forgot Password?</a>
+        <paper-textarea id="loginnotification" class="no-underline" height="100%" label="Notifications" placeholder="{{_prognot}}" readonly="true" scrollable></paper-textarea>
+    </div>
+    
+    <div id="{{_registerdivid}}">
+        <form id="registrationform">
+            <h2>Register</h2>
+            <paper-input type="name"  no-label-float class="no-underline" value='{{_regnameinput}}' label="Username"></paper-input>
+            <paper-input type="{{_reginpwtype}}"  no-label-float class="no-underline" value='{{_regpwinput}}' label="Password">
+                <paper-icon-button tabindex="-1" suffix on-tap="regchangePw" icon="{{_reginpwvisicon}}"></paper-icon-button>
+            </paper-input>
+            <paper-input type="{{_reginglobtype}}"  no-label-float class="no-underline" value='{{_regglobpwinput}}' label="Global password">
+                <paper-icon-button tabindex="-1" suffix on-tap="regchangeGlob" icon="{{_reginglobvisicon}}"></paper-icon-button>
+            </paper-input>
+            <paper-input type="name"  no-label-float class="no-underline" value='{{_regfoldernameinput}}' label="Folder name"></paper-input>
+            <paper-button on-click="gotoLogin">Back</paper-button>
+            <paper-button class="button" on-click="handleRegister">Register</paper-button>
+        </form> 
+        <paper-textarea class="no-underline" height="200%" label="Notifications" placeholder="{{_registerprognot}}" readonly="true" scrollable></paper-textarea>
+
+	 
+        <paper-card class="dark" style="width:650px; height: 120px; display: flex">
+            <iron-icon icon="help-outline"></iron-icon>
+            <div class="card-content" style="width:600px; height: 120px;">Username and password both have to be at least 6 characters. Password has to have at least one letter in uppercase, one letter in lowercase and at least one digit.</div>
+        </paper-card>
+    </div>
+    <div id="{{_sharedivid}}">
+        <h2 id="shareerror"></h2>
+	</div>
+
+	
+</div>
+
+
+<paper-icon-button style$="visibility: {{_showNotifications}}"  on-tap="expandNotifications" icon="expand-more" id="showNotifications"></paper-icon-button>
+<div style$="visibility: {{_showNotifications}}"  id="lastNotificationDiv">
+    <span id="lastNotification">{{_lastNotification}}</span>
+</div> 
+<div style$="visibility: {{_showNotifications}}" id="notificationRedDot" style$="visibility: {{_lastNotificationSeen}}"></div>
+<paper-card style$="visibility: {{_showNotifications}}"  id="infCardDiv" class="dark" style="width: calc(100% - 400px); height: 60px; display: flex">
+    <iron-icon icon="help-outline" style$="visibility: {{_showNotifications}}" id="help-icon"></iron-icon>
+    <div id="infCard" class="card-content" style="padding: 6px; display: grid; align-content: center"></div>
+</paper-card>
+<paper-button id="design-mode" on-click="toggleDesignMode" style$="visibility: {{_showdesign}}"></paper-button>
+<paper-icon-button icon="reply" on-tap="openShare" style$="visibility: {{_showshare}}" id="share-button"></paper-icon-button>
+</template>
+
+<script>
+
+Polymer({
+    is: 'vz-multidash',
+    properties: {
+        _routePrefix: {
+            type: String,
+            value: () => tf_backend.getRouter().pluginRoute('multidash', ''),
+        },
+        _initialized: Boolean,
+        _plugins: {
+            type: Array,
+            value: []
+        },
+        _notifications:{
+            type: Array,
+            value: []
+        },
+        _savelayout: Function,
+        _headers: {
+            type: Array,
+            value: []
+        },
+        _designMode: {
+            type: String,
+            value: "hidden",
+        },
+        _prognot: {
+            type: String,
+            value: '',
+        },
+        _pwinput: {
+            type: String,
+            value: '',
+        },
+        _nameinput: {
+            type: String,
+            value: '',
+        },
+        _pwvisibility: {
+            type: String,
+            value: 'visible',
+        },
+        _logindivid: {
+            type: String,
+            value: 'login',
+        },
+        _registerdivid: {
+            type: String,
+            value: 'hidden-login',
+        },
+        _regnameinput: {
+            type: String,
+            value: '',
+        },
+        _regpwinput: {
+            type: String,
+            value: '',
+        },
+        _regglobpwinput: {
+            type: String,
+            value: '',
+        },
+        _regfoldernameinput: {
+            type: String,
+            value: '',
+        },
+        _registerprognot: {
+            type: String,
+            value: '',
+        },
+        _shareerror: {
+            type: String,
+            value: 'hidden',
+        },
+        _sharenormal: {
+            type: String,
+            value: 'visible',
+        },
+        _sharelink: {
+            type: String,
+            value: '',
+        },
+        _sharedivid: {
+            type: String,
+            value: 'hidden',
+        },
+        _encryptedlogdir: {
+            type: String,
+            value: '',
+        },
+        _showdesign: {
+            type: String,
+            value: 'hidden',
+        },
+        _showshare: {
+            type: String,
+            value: 'visible',
+        },
+        _normalmode: {
+            type: Boolean,
+            value: false,
+        },
+        _highres:{
+            type: String
+        },
+        _sprite:{
+            type: String
+        },
+        _startClustering:{
+                    type: String
+                },
+        _evaluateClusters:{
+                    type: String
+                },
+        _unifyAndOutlier:{
+                    type: String
+                },
+        _modifyLabels:{
+                    type: String
+                },
+        _startTraining:{
+                    type: String
+                },
+        _downloadMetadata:{
+                    type: String
+                },
+        _downloadResults:{
+                    type: String
+                },
+        _loginpwtype: {
+            type: String,
+            value:"password" 
+        },
+        _loginpwvisicon: {
+            type: String,
+            value: "visibility-off",
+        },
+        _reginpwvisicon: {
+            type: String,
+            value: "visibility-off"
+        },
+        _reginpwtype: {
+            type:String,
+            value: "password",
+        },
+        _reginglobtype: {
+            type: String,
+            value: "password",
+        },
+        _reginglobvisicon: {
+            type: String,
+            value: "visibility-off"
+        },
+        _selectedRunTest: {
+            type: String,
+            value: ""
+        },
+        _forgotpwname: {
+            type: String,
+            value: ""
+        },
+        _forgotpwglobal: {
+            type: String,
+            value: ""
+        },
+        _forgotpwnewconfirm: {
+            type: String,
+            value: "",
+        },
+        _forgotpwnew: {
+            type: String,
+            value: "",
+        },
+        _lastNotification: {
+            type: String,
+            value: "",
+        },
+        _lastNotificationSeen : {
+            type: String,
+            value: "hidden",
+        },
+        _showNotifications : {
+            type: String,
+            value: "hidden",
+        },
+        _pluginResized : {
+            type: Object,
+        },
+        _resizeEvent : {
+            type: Object,
+        }
+    },
+
+    handlecheckboxChanged(){
+        console.log(this._highres, this._sprite, this._startClustering, this._evaluateClusters, this._unifyAndOutlier, this._modifyLabels, this._startTraining, this._downloadMetadata, this._downloadResults)
+        this._sharelink = window.location.href + '/';
+
+        const xhra = new XMLHttpRequest();
+        xhra.open('GET', this._routePrefix + `/encrypt?string=${tf_tensorboard.sublogdir + '/' + this._highres + "," + this._sprite + "," + this._startClustering+ "," + this._evaluateClusters+ "," +this._unifyAndOutlier+ "," + this._modifyLabels+ "," + this._startTraining+ "," + this._downloadMetadata+ "," + this._downloadResults + "/" + tf_tensorboard.username + "/" + tf_tensorboard.password}`);
+        xhra.onerror = (err) => {
+            console.log('Network problem');
+        };
+        xhra.onload = () => {
+            this._sharelink += xhra.responseText;
+        }
+        xhra.send();
+    },
+
+    openForgotPassword(){
+        this.$.forgotpassword.open();
+    },
+ 
+    expandNotifications: function(){
+        const xhra = new XMLHttpRequest();
+        xhra.open('GET', this._routePrefix + `/getnotifications?sublogdir=${tf_tensorboard.sublogdir}`);
+        xhra.onerror = (err) => {
+            console.log('Network problem');
+        };
+        xhra.onload = () => {
+            this._notifications = JSON.parse(xhra.responseText).reverse();
+            console.log(this._notifications);
+        }
+        xhra.send();
+        this.$.notifications.open();
+        this._lastNotificationSeen = "hidden";
+    },
+
+    handleAddNewNotification: function(obj){
+        const xhra = new XMLHttpRequest();
+        xhra.open('GET', this._routePrefix + `/setnotification?title=${obj.title}&sublogdir=${tf_tensorboard.sublogdir}&icon=${obj.icon}&plugin=${obj.plugin}`);
+        xhra.onerror = (err) => {
+            console.log('Network problem');
+        };
+        xhra.onload = () => {
+            console.log(xhra.responseText);
+            this._lastNotification = "Last notification: ";
+            this._lastNotificationSeen = "visible";
+            this._lastNotification += obj.title;
+        }
+        xhra.send();
+    },
+
+    toggleDesignMode(){
+        if(tf_tensorboard.logged){
+
+            if(this._designMode === "visible"){
+                this._savelayout();
+                console.log("Layout Saved")
+            }
+
+            this._designMode = (this._designMode === "visible") ? "hidden" : "visible";
+            console.log("Design Mode: " + this._designMode);
+
+            var layout_button = document.getElementById("design-mode"); 
+            layout_button.innerHTML = (this._designMode === "visible") ? "Save Layout" : "Change Layout";
+            console.log("Layout Button text: " + layout_button.innerHTML);
+
+            var collector = document.getElementById("multidash-collector");
+            var movable = collector.firstChild;
+            for (var plugin of this._plugins) {
+                var header = movable.firstChild;
+                let header_style = (this._designMode === "visible") ?
+                "padding: 10px; height: 20px; cursor: move; background-color: #29b6f6; color: #fff; text-align: center;"
+                : "visibility: hidden; height: 0px; position: absolute;"
+                header.setAttribute("style", header_style);
+
+                var container = header.nextSibling;
+                let container_style = (this._designMode === "visible") ?
+                "position: relative; background-color: #ffffff; height: calc(100% - 55px);"
+                : "position: relative; background-color: #ffffff; height: 100%;"
+                container.setAttribute("style", container_style);
+
+                var footer = container.nextSibling;
+                let footer_style = (this._designMode === "visible") ?
+                "background-color: #ffffff; height: 15px; z-index: 999; border: 1px solid #d3d3d3;"
+                : "visibility: hidden; height: 0px; position: absolute;"
+                footer.setAttribute("style", "background-color: #ffffff; height: 15px; z-index: 999; border: 1px solid #d3d3d3;");
+
+                movable.style.resize = (this._designMode === "visible") ? "both" : "none";
+
+                movable = movable.nextSibling;
+
+                console.log("Set stylesheets for: " + plugin);
+
+            }
+        }
+        else{
+            console.log("Not logged in");
+            return
+        }
+    },
+
+    openShare(){
+        this.$.share.open();
+
+        if(tf_tensorboard.logged){
+            this._sharenormal = 'visible';
+            this._shareerror = 'hidden';
+
+            this._sharelink = window.location.href + '/';
+
+            const xhra = new XMLHttpRequest();
+            xhra.open('GET', this._routePrefix + `/encrypt?string=${tf_tensorboard.sublogdir + '/false,false,false,false,false' + "/" + tf_tensorboard.username + "/" + tf_tensorboard.password}`);
+            xhra.onerror = (err) => {
+                console.log('Network problem');
+            };
+            xhra.onload = () => {
+                this._sharelink += xhra.responseText;
+            }
+            xhra.send();
+        }
+        else{
+            this._sharenormal = 'hidden';
+            this._shareerror = 'visible';
+            return
+        }
+    },
+
+    regchangePw : function(){
+        if (this._reginpwtype == "password"){
+            this._reginpwvisicon = "visibility";
+            this._reginpwtype = "name";
+        }
+        else{
+            this._reginpwvisicon = "visibility-off";
+            this._reginpwtype = "password";
+        }
+    },
+
+    changePw : function(){
+        if (this._loginpwtype == "password"){
+            this._loginpwtype = "name";
+            this._loginpwvisicon = "visibility";
+        }
+        else{
+            this._loginpwtype = "password";
+            this._loginpwvisicon = "visibility-off";
+        }
+    },
+
+    regchangeGlob: function(){
+        
+        if(this._reginglobtype == "password"){
+            this._reginglobtype = "name"
+            this._reginglobvisicon = "visibility"
+        }else{
+            this._reginglobtype = "password"
+            this._reginglobvisicon = "visibility-off"
+        }
+    },
+    
+    setInfo: function(text) {
+        var card = document.getElementById("infCard");
+        console.log("SHOULD APPEAR:");
+        console.log(text);
+        console.log(card.innerHTML);
+        card.innerHTML = text;
+    },
+
+    pluginResized: function(plugin){
+        console.log(plugin);
+    },
+
+    handleLogin: function(e){
+        if(!tf_tensorboard.viewmode){
+            e.preventDefault();
+        }
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `${this._routePrefix}/login?name=${this._nameinput}&password=${this._pwinput}`)
+        xhr.onerror = (err) => {
+            console.log('Network problem');
+        };
+        xhr.onload = () => {
+            let response = xhr.responseText;
+            // if the name and the password were correct
+            // hide the login/registration panel
+            // set the sublogdir 
+            // generate the plugins
+            if(response != 'incorrect' || tf_tensorboard.logged){
+                if(this._normalmode){
+                    tf_tensorboard.sublogdir = ' ';
+                }
+                else{
+                    if(!tf_tensorboard.viewmode){
+                        tf_tensorboard.sublogdir = response;
+                    }
+                }
+                tf_tensorboard.logged = true;
+                this._pwvisibility = 'hidden';
+                this._prognot = 'Correct!\n';
+                this._showNotifications = "visible";
+                this._showdesign = "visible";
+                
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', this._routePrefix + `/cnf?subfolder=${tf_tensorboard.sublogdir}`);
+                xhr.onload = () => {
+                    let json_response = JSON.parse(xhr.responseText);
+                    let plugins = json_response["plugins"],
+                    layout = json_response["layout"],
+                    mode = json_response["mode"];
+                    this._designMode = (mode === "design") ? "visible" : "hidden";
+
+                    var layout_button = document.getElementById("design-mode"); 
+                    layout_button.innerHTML = (this._designMode === "visible") ? "Save Layout" : "Change Layout";
+
+                    //var info_card = document.getElementById("infCard");
+                    //info_card.innerHTML = "Welcome to the NIPGBoard! To get started, please select a Base Learner model and a dataset to create an embedding, or select an existing embedding for analysis!";
+
+                    this._pluginResized = new MutationObserver(function(entries) {
+                        for (let entry of entries){
+                            console.log("plugin state changed: "+entry.target.firstChild.innerHTML);
+                            entry.target.childNodes[1].firstChild.dispatchEvent(new Event("sizechanged"));
+                        }
+                    });
+
+                    for (var plugin of plugins) {
+                        if (this._plugins.indexOf(plugin) > -1) {
+                            return;
+                        }
+                        else {
+                        this._plugins.push(plugin);
+
+                        var pluginEl = document.createElement("vz-"+plugin+"-dashboard"),
+                        movable = document.createElement("div"),
+                        header = document.createElement("div"),
+                        container = document.createElement("div"),
+                        footer = document.createElement("div"),
+                        collector = document.getElementById("multidash-collector");
+                        collector.style.overflowX = "auto";
+                    
+                        let pluginRoute = tf_backend.getRouter().pluginRoute(plugin,'');
+                        container.appendChild(pluginEl);
+
+                        //We have to manually inject stylesheets for it to work inside polymer templates.
+                        header.setAttribute("class", "m-header");
+                        header.innerHTML = plugin;
+                        let header_style = (mode === "design") ?
+                        "padding: 10px; height: 20px; cursor: move; background-color: #29b6f6; color: #fff; text-align: center;"
+                        : "visibility: hidden; height: 0px; position: absolute;"
+                        header.setAttribute("style", header_style);
+
+                        container.setAttribute("class", "m-container");
+                        let container_style = (mode === "design") ?
+                        "position: relative; background-color: #ffffff; height: calc(100% - 55px);"
+                        : "position: relative; background-color: #ffffff; height: 100%;"
+                        container.setAttribute("style", container_style);
+
+                        footer.setAttribute("class", "m-footer");
+                        let footer_style = (mode === "design") ?
+                        "background-color: #ffffff; height: 15px; z-index: 999; border: 1px solid #d3d3d3;"
+                        : "visibility: hidden; height: 0px; position: absolute;"
+                        footer.setAttribute("style", footer_style);
+
+                        movable.appendChild(header);
+                        movable.appendChild(container);
+                        movable.appendChild(footer);
+                        this.makeMovable(header);
+                        this._headers.push(header);
+
+                        console.log(layout);
+                        console.log(layout[plugin][0]*collector.clientHeight/100);
+                        console.log('-----');
+                        movable.setAttribute("class", "m-movable");
+                        //removed the z-index: 1
+                        let main_style = "position: absolute;  background-color: #f1f1f1; border: 2px solid; overflow: hidden; min-width: 200px; min-height:  200px; "
+                        let layout_style = (layout[plugin] ? `top: ${layout[plugin][0]}px; left: ${layout[plugin][1]}px; width: ${layout[plugin][2]}px; height: ${layout[plugin][3]}px;` : 'top: 0px; left: 0px; width: 500px; height: 500px;')
+                        let resizable = (mode === "design") ? "resize: both" : "";
+                        movable.setAttribute("style", main_style+layout_style+resizable);
+
+                        this._pluginResized.observe(movable,{attributes:true});
+
+                        collector.appendChild(movable);
+                        }
+                    }
+                    this._initialized = true;
+
+                    tf_tensorboard.registerHelpChangedListener(
+                        (text) =>
+                            this.setInfo(text), "multidash");
+
+                    let spw = new XMLHttpRequest();
+                    spw.open('GET', this._routePrefix + `/encrypt?string=${this._pwinput}`);
+                    spw.onload = () => {
+                        let pw = spw.responseText;
+                        if(!tf_tensorboard.viewmode) {
+                            tf_tensorboard.username = this._nameinput;
+                            tf_tensorboard.password = pw;
+                        }
+                        let sloc = new XMLHttpRequest();
+                        sloc.open('GET', this._routePrefix + `/board`);
+                        sloc.onload = () => {
+                            tf_tensorboard.boardPath = sloc.responseText;
+                            console.log(tf_tensorboard.boardPath);
+                        }
+                        sloc.send();
+                    }
+                    spw.send();
+                    // waiting
+                    //tf_tensorboard.handleAddNewNotification({title: "asdasd", icon: "close"}); not ok
+                    //tf_tensorboard.handleAddNewNotification({title: "asdasd", icon: "hourglass-empty"}); ok
+                    tf_tensorboard.handleAddNewNotification({title: "Logged in!", icon: "check", plugin: "Multidash"}); 
+                };
+                xhr.onerror = () => {
+            //TODO: plugin config file empty, or corrupt
+            this._initialized = false;
+        };
+        xhr.send();
+            }
+            else{
+                this._prognot = 'Incorrect username or password, try again!\n';
+            }
+        };
+        xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+        xhr.send();
+    },
+
+    // hide login
+    // show registration
+    // with CSS
+    gotoRegister: function(){
+        this._prognot = '';
+        this._logindivid = 'hidden-login';
+        this._registerdivid = 'login';
+    },
+
+    // hide registration
+    // show login
+    // with CSS
+    gotoLogin: function(){
+        this._prognot = '';
+        this._logindivid = 'login';
+        this._registerdivid = 'hidden-login';
+    },
+
+    // if the registracion is successfull return the User to login
+    handleRegister:function(){
+        const xhra = new XMLHttpRequest();
+        xhra.open('GET', this._routePrefix + `/register?name=${this._regnameinput}&pw=${this._regpwinput}&globpw=${this._regglobpwinput}&folder=${this._regfoldernameinput}`);
+        xhra.onerror = (err) => {
+            console.log('Network problem');
+        };
+        xhra.onload = () => {
+            if(xhra.responseText == 'globalpw'){
+                this._registerprognot = 'Incorrect global password!\n';
+            }
+            else if(xhra.responseText == 'taken_username'){
+                this._registerprognot = 'This username is already taken!\n';
+            }
+            else if(xhra.responseText == 'no_config'){
+                this._registerprognot = 'Configuration file missing!\n';
+            }
+            else if(xhra.responseText == 'config_corrupt'){
+                this._registerprognot = 'Unable to access configuration file!\n';
+            }
+            else if(xhra.responseText == 'config_incorrect'){
+                this._registerprognot = 'Incorrect configuration file!\n';
+            }
+            else if(xhra.responseText == 'taken_folder'){
+                this._registerprognot = 'This foldername is already taken!\n';
+            }
+            else if(xhra.responseText == 'folder_length'){
+                this._registerprognot = 'This foldername is too short! Minimum length is 6 character!\n';
+            }
+            else if(xhra.responseText == 'no_folder'){
+                this._registerprognot = 'Folder not found!\n';
+            }
+            else if(xhra.responseText == 'pw_upper'){
+                this._registerprognot = 'The password should contain uppercase character!\n';
+            }
+            else if(xhra.responseText == 'pw_lower'){
+                this._registerprognot = 'The password should contain lowercase character!\n';
+            }
+            else if(xhra.responseText == 'pw_digit'){
+                this._registerprognot = 'The password should contain a digit!\n';
+            }
+            else if(xhra.responseText == 'pw_length'){
+                this._registerprognot = 'The password is too short! Minimum length is 6 character!\n';
+            }
+            else if(xhra.responseText == 'username_length'){
+                this._registerprognot = 'The username is too short! Minimum length is 6 character!\n';
+            }
+            else if(xhra.responseText == 'ok'){
+                this._prognot = 'Successful registration!\n'
+                this._registerprognot = 'Successful registration!\n';
+                this._logindivid = 'login';
+                this._registerdivid = 'hidden-login';
+            }
+            else if(xhra.responseText == 'okwo'){
+                this._prognot = 'Successful registration!\n'
+                this._registerprognot = 'Successful registration!\n';
+                this._logindivid = 'login';
+                this._registerdivid = 'hidden-login';
+            }
+
+        }
+        xhra.send();
+
+    },
+
+    handleResetPw(){
+        console.log(this._forgotpwname)
+        console.log(this._forgotpwglobal)
+        console.log(this._forgotpwnew)
+        console.log(this._forgotpwnewconfirm)
+
+        const xhra = new XMLHttpRequest();
+        xhra.open('GET', this._routePrefix + `/forgotpassword?name=${this._forgotpwname}&global=${this._forgotpwglobal}&password=${this._forgotpwnew}&passwordconfirm=${this._forgotpwnewconfirm}`);
+        xhra.onerror = (err) => {
+            console.log('Network problem');
+        };
+        xhra.onload = () => {
+            let response = xhra.responseText;
+            if(response === "ok"){
+                this.$.forgotpassword.close();
+                this._prognot = 'Password updated!\n';
+            }
+            else{
+                alert(response);
+            }
+        }
+        xhra.send();
+
+    },
+
+    _savelayout: function() {
+
+        let layout_data = {}
+        for (var header of this._headers) {
+            let collector = document.getElementById("multidash-collector");
+            layout_data[header.innerHTML] = [parseInt(header.parentNode.style.top, 10),
+                                             parseInt(header.parentNode.style.left, 10),
+                                             header.parentNode.clientWidth,
+                                             header.parentNode.clientHeight];
+        }
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', this._routePrefix + `/layout?subfolder=${tf_tensorboard.sublogdir}`);
+        xhr.send(JSON.stringify(layout_data));
+
+    },
+
+    makeMovable(header){
+        var pos1, pos2, pos3, pos4 = 0;
+        header.onmousedown = dragMouseDown;
+        let _ret = this;
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            changeZ(header.innerHTML);
+
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
+
+        function changeZ(inner) {
+            var headers = document.getElementsByClassName("m-header"),
+                flag = false;
+            for (var i = 0; i < headers.length; i++ ){
+                if (headers[i].innerHTML === inner) {
+                    headers[i].parentNode.style["z-index"] = 2;
+                    flag = true;
+                } else if (flag) {
+                    headers[i].parentNode.style["z-index"] = 1;
+                }
+            }
+        }
+
+        function closeDragElement(e) {
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+
+            let newTop = header.parentNode.offsetTop - pos2;
+            header.parentNode.style.top = (newTop >= 0) ? newTop + "px" : 0 + "px";
+            let newLeft = header.parentNode.offsetLeft - pos1,
+                rightEdge = window.screen.width - header.parentNode.clientWidth;
+            //header.parentNode.style.left = (newLeft >= 0) ? ( (newLeft < rightEdge) ? newLeft + "px" : rightEdge + "px") : 0 + "px";
+            header.parentNode.style.left = (newLeft >= 0) ? newLeft + "px" : 0 + "px";
+        }
+    },
+    showPos(event, text){
+        alert("clicked");
+    },
+
+    ready() {
+        this._lastNotification = "";
+        this._lastNotificationSeen = "hidden";
+                
+        if(tf_tensorboard.viewlink.split('#')[1].split('/').length == 2){
+            tf_tensorboard.viewmode = true;
+            this._encryptedlogdir = tf_tensorboard.viewlink.split('#')[1].split('/')[1];
+        }
+
+        if(tf_tensorboard.viewmode){
+            this._showdesign = 'hidden';
+            this._showshare = 'hidden';
+            this._sharedivid = 'visible';
+            this._logindivid = 'hidden';
+            this._registerdivid = 'hidden';
+            tf_tensorboard.logged = true;
+            try{
+                const xhr = new XMLHttpRequest();
+            xhr.open('GET', this._routePrefix + `/decrypt?string=${this._encryptedlogdir}`);
+            xhr.onerror = function() {
+            };
+            xhr.onload = () => {
+                if(xhr.status !== 200){
+                    alert('Incorrect view URL, please contact the administrator!');
+                    document.getElementById('shareerror').innerHTML = "Wrong view URL please contact the administrator!";
+                }
+                let res = xhr.responseText; //falsefalsefalse
+                console.log(res);
+                console.log(res);
+                tf_tensorboard.sublogdir = res.split('/')[0];
+                let dis = res.split('/')[1].split(',')
+                console.log(dis);
+
+                if(dis[0] == 'true'){
+                    console.log("highres disabled");
+                    tf_tensorboard.disablehighres = true;
+                }
+                if(dis[1] == 'true'){
+                    console.log("sprite disabled");
+                    tf_tensorboard.disablesprite = true;
+                }
+                //start clustering
+                if(dis[2] == 'true'){
+                    console.log("clustering disabled");
+                    tf_tensorboard.disableclustering = true;
+                }
+                //kira pairs
+                if(dis[3] == 'true'){
+                    console.log("pairs disabled");
+                    tf_tensorboard.disablepairwise = true;
+                }
+                //unify clusters, create outlier
+                if(dis[4] == 'true'){
+                    console.log("unify outlier disabled");
+                    tf_tensorboard.unifyandoutlier = true;
+                }
+                //modify labels
+                if(dis[5] == 'true'){
+                    console.log("modifylabels disabled");
+                    tf_tensorboard.modifylabels = true;
+                }
+                //start training
+                if(dis[6] == 'true'){
+                    console.log("training disabled");
+                    tf_tensorboard.disabletraining = true;
+                }
+                //download metadata
+                if(dis[7] == 'true'){
+                    console.log("download disabled");
+                    tf_tensorboard.disabledownload = true;
+                }
+                //download results
+                if(dis[8] == 'true'){
+                    console.log("export disabled");
+                    tf_tensorboard.disableexport = true;
+                }
+                tf_tensorboard.username = res.split('/')[2];
+                tf_tensorboard.password = res.split('/')[3];
+                console.log("BEFORE");
+                console.log(tf_tensorboard.username);
+                console.log(tf_tensorboard.password);
+                this.handleLogin();
+                console.log("AFTER");
+                console.log(tf_tensorboard.username);
+                console.log(tf_tensorboard.password);
+            }
+            xhr.send();
+
+            }catch(err)
+            {
+                console.log(err);
+            }
+            
+        }
+
+        const xhra = new XMLHttpRequest();
+        xhra.open('GET', this._routePrefix + `/needlogin`);
+        xhra.onerror = (err) => {
+            console.log('Network problem');
+        };
+        xhra.onload = () => {
+            if(xhra.responseText == "no"){
+                this._normalmode = true;
+                this._showdesign = "hidden";
+                this._showshare = "hidden";
+                tf_tensorboard.logged = true;
+                this._pwvisibility = 'hidden';
+                tf_tensorboard.sublogdir = " ";
+                if(tf_tensorboard.logged){
+                    this.handleLogin();
+                }
+            }
+        }
+        xhra.send();
+    },
+
+    attached() {
+
+        // if the configuration file doesn't contains global password -> normal board, no registration
+        // the sublogir's name is ' ' (a space) means there is just the global logdin
+        
+    },
+    });
+
+</script>
+</dom-module>

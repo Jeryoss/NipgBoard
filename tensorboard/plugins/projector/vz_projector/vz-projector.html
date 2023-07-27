@@ -1,0 +1,218 @@
+<!--
+@license
+Copyright 2016 The TensorFlow Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../iron-collapse/iron-collapse.html">
+<link rel="import" href="../iron-icons/image-icons.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/notification-icons.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../paper-styles/typography.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../tf-imports/threejs.html">
+<link rel="import" href="../tf-tensorboard/synchronizationEventContext.html">
+<link rel="import" href="bundle.html">
+<link rel="import" href="styles.html">
+<link rel="import" href="vz-projector-bookmark-panel.html">
+<link rel="import" href="vz-projector-data-panel.html">
+<link rel="import" href="vz-projector-input.html">
+<link rel="import" href="vz-projector-inspector-panel.html">
+<link rel="import" href="vz-projector-metadata-card.html">
+<link rel="import" href="vz-projector-projections-panel.html">
+
+<dom-module id="vz-projector">
+<template>
+<style include="vz-projector-styles"></style>
+<style include="vz-projector-style"></style>
+<paper-dialog id="notification-dialog" modal>
+  <h2 id="notification-title"></h2>
+  <paper-dialog-scrollable>
+    <div id="notify-msgs"></div>
+  </paper-dialog-scrollable>
+  <div style="text-align: center;"><paper-spinner-lite active class="progress"></paper-spinner-lite></div>
+  <div class="buttons">
+    <paper-button class="close-button" dialog-confirm autofocus>Close</paper-button>
+  </div>
+</paper-dialog>
+<div id="container">
+  
+  <div id="left-pane" class="ink-panel" >
+    <div>Image Size:</div>
+    <paper-slider id="imageSize" min="0.001" max="2.0" value="{{imagesize}}" step="0.001" style="width: 100%" on-change="imageSizeChange"></paper-slider>
+    <!-- <vz-projector-alg-panel id="alg-panel"></vz-projector-alg-panel>-->
+    <vz-projector-data-panel id="data-panel"></vz-projector-data-panel>
+    <vz-projector-projections-panel id="projections-panel"></vz-projector-projections-panel>
+  </div>
+  <div id="main" class="ink-panel">
+    <div class="ink-panel-menubar">
+      <paper-icon-button id="selectMode" alt="Bounding box selection" toggles icon="image:add-to-photos"></paper-icon-button>
+      <paper-tooltip for="selectMode" position="bottom" animation-delay="0" fit-to-visible-bounds>Bounding box selection</paper-tooltip>
+
+      <paper-icon-button id="editMode" alt="Edit current selection" toggles icon="image:exposure"></paper-icon-button>
+      <paper-tooltip for="editMode" position="bottom" animation-delay="0" fit-to-visible-bounds>Edit current selection</paper-tooltip>
+      
+      <div style="border-left:1px solid #57575794;height:60%"></div>
+
+      <div style="display: grid; width: 40px">
+        <paper-icon-button id="addPosPairs" disabled="true" alt="Add positive pairs" toggles icon="notification:sync" style="color:rgba(0,128,0,0.2)">></paper-icon-button>
+        <paper-tooltip for="addPosPairs" position="bottom" animation-delay="0" fit-to-visible-bounds>Add positive pairs</paper-tooltip>
+        <span title="Amount of positive pairs currently annotated by user vs the amount of positive pairs that are a result of the transitional property."
+              style="position: absolute; top: 45px; width: 40px; font-size: 10px; z-index: 1; border: 1px solid rgba(0, 0, 0, 0.02); background: white; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); color: green; text-align: center">
+          <div id="pos1" style="border-bottom: 1px solid rgb(0,128,0);">0</div>
+          <div id="pos2">0</div>
+        </span>
+      </div>
+      
+      <div style="display: grid; width: 40px">
+        <paper-icon-button id="addNegPairs" disabled="true" alt="Add negative pairs" toggles icon="notification:sync-problem" style="color:rgba(255,0,0,0.2)"></paper-icon-button>
+        <paper-tooltip for="addNegPairs" position="bottom" animation-delay="0" fit-to-visible-bounds>Add negative pairs</paper-tooltip>
+        <span title="Amount of negative pairs currently annotated by user vs the amount of negative pairs that are a result of the transitional property."
+              style="position: absolute; top: 45px; width: 40px; font-size: 10px; z-index: 1; border: 1px solid rgba(0, 0, 0, 0.02); background: white; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); color: red; text-align: center">
+          <div id="neg1" style="border-bottom: 1px solid rgb(256,0,0);">0</div>
+          <div id="neg2">0</div>
+        </span>
+      </div>
+
+      <paper-icon-button id="removePairs" disabled="true" alt="Remove pairs" toggles icon="notification:sync-disabled" style="color:rgba(0,0,0,0.2)"></paper-icon-button>
+      <paper-tooltip for="removePairs" position="bottom" animation-delay="0" style="font-size:20px" fit-to-visible-bounds>Remove pairs</paper-tooltip>
+
+      <paper-icon-button id="removeAll" alt="Remove all pairs at once" icon="icons:delete"></paper-icon-button>
+      <paper-tooltip for="removeAll" position="bottom" animation-delay="0" fit-to-visible-bounds>Remove all pairs at once</paper-tooltip>
+
+      <div style="border-left:1px solid #57575794;height:60%"></div>
+
+      <paper-icon-button id="unifyClusters" disabled="true" alt="Remove pairs" toggles icon="icons:compare-arrows" style="color:rgba(0,0,0,0.2)"></paper-icon-button>
+      <paper-tooltip for="unifyClusters" position="bottom" animation-delay="0" fit-to-visible-bounds>Unify Clusters</paper-tooltip>
+
+      <paper-icon-button id="createOutlier" disabled="true" alt="Remove pairs" toggles icon="icons:swap-horiz" style="color:rgba(0,0,0,0.2)"></paper-icon-button>
+      <paper-tooltip for="createOutlier" position="bottom" animation-delay="0" fit-to-visible-bounds>Create Outlier</paper-tooltip>
+
+      <div style="border-left:1px solid #57575794;height:60%"></div>
+
+      <paper-icon-button id="noNonSelected" alt="Make elements unrelated to selection disappear" toggles icon="image:filter-none"></paper-icon-button>
+      <paper-tooltip for="noNonSelected" position="bottom" animation-delay="0" fit-to-visible-bounds>No unrelated elements</paper-tooltip>
+
+      <paper-icon-button id="noNonPaired" alt="Make elements that aren't connected to anything disappear" toggles icon="image:filter-2"></paper-icon-button>
+      <paper-tooltip for="noNonPaired" position="bottom" animation-delay="0" fit-to-visible-bounds>No unpaired elements</paper-tooltip>
+
+      <div style="border-left:1px solid #57575794;height:60%"></div>
+
+      <paper-icon-button id="showLeftPanel" alt="Hide/Show projection settings" toggles icon="icons:build"></paper-icon-button>
+      <paper-tooltip for="showLeftPanel" position="bottom" animation-delay="0" fit-to-visible-bounds>Hide/Show projection settings</paper-tooltip>
+
+      <paper-icon-button id="showInfo" icon="help-outline" ></paper-icon-button>
+      <paper-tooltip for="showInfo" position="bottom" animation-delay="0" fit-to-visible-bounds>Instructions</paper-tooltip>
+
+      <!-- Make this button visible again in order to be able to switch between N^2 and N selection modes -->
+      <div style="visibility: hidden; width: 0px">
+        <paper-icon-button id="groupMode" alt="N^2 or N selection mode" toggles icon="image:brightness-7" active></paper-icon-button>
+        <paper-tooltip for="groupMode" position="bottom" animation-delay="0" fit-to-visible-bounds>N^2 or N Selection Mode</paper-tooltip>
+      </div>
+
+      <paper-card class="dark" style="width: calc(100% - 400px); height: 60px; display: flex">
+        <!--<div id="infoCard" class="card-content" style="padding: 6px; display: grid; align-content: center">Welcome to the NIPGBoard! To get started, please select a Base Learner model and a dataset to create an embedding, or select an existing embedding for analysis!</div>-->
+      </paper-card>
+
+      <div class="status-bar-panel" style="visibility: hidden; width: 0px">
+        <div class="status-bar-entry">Points: <span class="numDataPoints">Loading...</span></div>
+        <div class="status-bar-entry">Dimension: <span class="dim">Loading...</span></div>
+        <div id="status-bar" class="status-bar-entry" style="display: none;"></div>
+      </div>
+      <div class="ink-fabs">
+        <paper-icon-button id="reset-zoom" class="ink-fab" alt="Reset zoom to fit all points" icon="home"></paper-icon-button>
+        <paper-tooltip for="reset-zoom" position="left" animation-delay="0">Reset zoom to fit all points</paper-tooltip>
+      </div>
+    </div>
+    <div class="stage">
+      <div id="scatter">
+        <svg id="selector"></svg>
+      </div>
+      <vz-projector-metadata-card id="metadata-card"></vz-projector-metadata-card>
+      <paper-icon-button raised onclick="help3dDialog.open()" icon="help-outline" id="help-3d-icon"></paper-icon-button>
+      <paper-tooltip animation-delay="0" for="help-3d-icon">Help with interaction controls.</paper-tooltip>
+      <paper-dialog id="help3dDialog" with-backdrop>
+        <div class="main" dialog-confirm autofocus>
+          <h3>3D controls</h3>
+            <b>Rotate</b> Mouse left click.<br/>
+            <b>Pan</b> Mouse right click.<br/>
+            <b>Zoom</b> Mouse wheel.<br/>
+            Holding <b>ctrl</b> reverses the mouse clicks.
+          <h3>2D controls</h3>
+            <b>Pan</b> Mouse left click.<br/>
+            <b>Zoom</b> Mouse wheel.
+          <div class="dismiss-dialog-note"> Click anywhere to dismiss.</div>
+        </div>
+      </paper-dialog>
+    </div>
+  </div>
+
+  <div id="right-pane" class="ink-panel" style="height:100% !important; overflow-y: hidden; display: none;">
+    <!-- <div style="align-content:center;">SELECTED IMAGE:</div>
+    <vz-selected style="height: 300px;"></vz-selected>
+    <div style="align-content:center; ">HOVERING ON IMAGE:</div>
+    <vz-image style="height: 300px;"></vz-image>
+    <div class="ink-panel-content active" style="visibility:hidden;height:0%">
+      <vz-projectors-inspector-panel id="inspector-panel"></vz-projectors-inspector-panel>
+    </div> -->
+    
+      <!-- <div class="ink-panel-content active">
+        <vz-projector-inspector-panel
+        id="inspector-panel"
+        ></vz-projector-inspector-panel>
+      </div> -->
+    
+      <div id="bookmark-panel-container">
+          <vz-projector-bookmark-panel id="bookmark-panel"></vz-projector-bookmark-panel>
+      </div>
+    </div>
+</div>
+<!--<paper-toast id="toast" always-on-top></paper-toast>-->
+
+<paper-dialog with-backdrop id="info">
+  <h3>Steps for creating pairs:</h3>
+  <div>1. Select a focus item.</div>
+  <div>2. Click on the positive/negative pair icon.</div>
+  <div>3. Select another similar/dissimilar image in relation with the focus item. It can be repeated several times.</div>
+  <div>4. For finishing click again on the positive/negative pair icon.</div>
+
+  <h3>Steps for unifying clusters:</h3>
+  <div>1. Select an element from the original cluster.</div>
+  <div>2. Click on the unify clusters icon.</div>
+  <div>3. Select an element from a target cluster.</div>
+  <div>4. Click on the unify clusters icon.</div>
+  <div>5. The target cluster will have the original cluster's name.</div>
+
+  <h3>Steps to create outlier:</h3>
+  <div>1. Click on the create outlier icon.</div>
+  <div>2. Select an element.</div>
+  <div>3. Click on the create outlier icon.</div>
+  <div>4. The selected element will be unassigned to any cluster.</div>
+</paper-dialog>
+
+</template> <!-- global template -->
+<script src="vz-projector.js"></script>
+</dom-module>

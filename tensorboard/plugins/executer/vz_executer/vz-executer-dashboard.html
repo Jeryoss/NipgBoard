@@ -1,0 +1,68 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../tf-backend/tf-backend.html">
+<link rel="import" href="../tf-dashboard-common/tf-no-data-warning.html">
+<link rel="import" href="../tf-tensorboard/registry.html">
+<link rel="import" href="vz-executer.html">
+
+<dom-module id="vz-executer-dashboard">
+<template>
+  <template is="dom-if" if="[[dataNotFound]]">
+    <div style="max-width: 540px; margin: 80px auto 0 auto;">
+      <h3>
+        No dataNotFound.
+      </h3>      
+    </div>
+  </template>
+  <template is="dom-if" if="[[!dataNotFound]]">
+    <vz-executer
+      id="executer"
+      route-prefix="[[_routePrefix]]"
+      serving-mode="server"
+      page-view-logging
+      event-logging
+    ></vz-executer>
+  </template>
+</template>
+<script>
+
+Polymer({
+  is: 'vz-executer-dashboard',
+  properties: {
+    dataNotFound: Boolean,
+    _routePrefix: {
+      type: String,
+      value: () => tf_backend.getRouter().pluginRoute('executer', ''),
+    },
+    // Whether this dashboard is initialized. This dashboard should only be initialized once.
+    _initialized: Boolean,
+  },
+  reload() {
+    // Do not reload the embedding projector. Reloading could take a long time.
+  },
+  attached() {
+    if (this._initialized) {
+      return;
+    }
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', this._routePrefix + '/runs');
+    xhr.onload = () => {
+      // Set this to true so we only initialize once.
+      this._initialized = true;
+      let runs = JSON.parse(xhr.responseText);
+      this.set('dataNotFound', runs.length === 0);
+    };
+    xhr.onerror = () => {
+      this.set('dataNotFound', false);
+    };
+    xhr.send();
+  },
+});
+
+tf_tensorboard.registerDashboard({
+  plugin: 'executer',
+  elementName: 'vz-executer-dashboard',
+  isReloadDisabled: true,
+});
+
+</script>
+</dom-module>

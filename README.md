@@ -2,6 +2,12 @@
 
 NipgBoard is a customized iteration of Tensorboard, specifically tailored for the purpose of unsupervised image classification. It incorporates advanced deep clustering technologies to enable swift and effective image annotations. The user-friendly interface empowers users to manually or automatically annotate images based on positive or negative associations between pairs of objects.
 
+This tool is designed to facilitate the training of deep clustering algorithms, providing a comprehensive solution for image classification tasks. With its intuitive features and capabilities, NipgBoard streamlines the process of image annotation and enhances the overall efficiency of unsupervised image classification workflows.
+
+## Samples
+![Sample](images/sample.png)
+
+
 ## Prerequisites
 
 Ensure that you fulfill the following prerequisites before attempting to install, build, and run NIPGBoard:
